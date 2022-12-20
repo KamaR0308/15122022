@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 import AppBar from "@material-ui/core/AppBar";
 import Box from "@material-ui/core/Box";
@@ -14,124 +14,124 @@ import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { makeStyles, useTheme as useMuiTheme } from "@material-ui/core/styles";
+import {makeStyles, useTheme as useMuiTheme} from "@material-ui/core/styles";
 
 import Tabs from '@mui/material/Tabs';
 import Tab from "@material-ui/core/Tab";
 
-import { useTranslation } from "PersonalKanban/providers/TranslationProvider";
+import {useTranslation} from "PersonalKanban/providers/TranslationProvider";
 import ColumnForm from "PersonalKanban/components/ColumnForm";
 import IconButton from "PersonalKanban/components/IconButton";
-import { Column } from "PersonalKanban/types";
-import { useTheme } from "PersonalKanban/providers/ThemeProvider";
+import {Column, User} from "PersonalKanban/types";
+import {useTheme} from "PersonalKanban/providers/ThemeProvider";
 
 // import PersonPinIcon from '@mui/icons-material/PersonPin';
 
 type AddColumnButtonProps = {
-  onSubmit: any;
+    onSubmit: any;
 };
 
 const AddColumnButton: React.FC<AddColumnButtonProps> = (props) => {
-  const { onSubmit } = props;
+    const {onSubmit} = props;
 
-  const { t } = useTranslation();
+    const {t} = useTranslation();
 
-  const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
 
-  const handleOpenDialog = React.useCallback(() => {
-    setOpen(true);
-  }, []);
+    const handleOpenDialog = React.useCallback(() => {
+        setOpen(true);
+    }, []);
 
-  const handleCloseDialog = React.useCallback(() => {
-    setOpen(false);
-  }, []);
+    const handleCloseDialog = React.useCallback(() => {
+        setOpen(false);
+    }, []);
 
-  const handleSubmit = React.useCallback(
-    (column: Column) => {
-      onSubmit({ column });
-      handleCloseDialog();
-    },
-    [onSubmit, handleCloseDialog]
-  );
+    const handleSubmit = React.useCallback(
+        (column: Column) => {
+            onSubmit({column});
+            handleCloseDialog();
+        },
+        [onSubmit, handleCloseDialog]
+    );
 
-  return (
-    <Box display="flex">
-      <IconButton icon="clear" color="primary" onClick={handleOpenDialog}>
-        {t("addColumn")}
-      </IconButton>
-      <Dialog onClose={handleCloseDialog} open={open}>
-        <DialogContent>
-          <ColumnForm onSubmit={handleSubmit} onCancel={handleCloseDialog} />
-        </DialogContent>
-      </Dialog>
-    </Box>
-  );
+    return (
+        <Box display="flex">
+            <IconButton icon="clear" color="primary" onClick={handleOpenDialog}>
+                {t("addColumn")}
+            </IconButton>
+            <Dialog onClose={handleCloseDialog} open={open}>
+                <DialogContent>
+                    <ColumnForm onSubmit={handleSubmit} onCancel={handleCloseDialog}/>
+                </DialogContent>
+            </Dialog>
+        </Box>
+    );
 };
 
 type ClearBoardButtonProps = {
-  onClear: any;
-  disabled?: boolean;
+    onClear: any;
+    disabled?: boolean;
 };
 
 const ClearBoardButton: React.FC<ClearBoardButtonProps> = (props) => {
-  const { disabled, onClear } = props;
+    const {disabled, onClear} = props;
 
-  const { t } = useTranslation();
+    const {t} = useTranslation();
 
-  const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
 
-  const handleOpenDialog = React.useCallback(() => {
-    setOpen(true);
-  }, []);
+    const handleOpenDialog = React.useCallback(() => {
+        setOpen(true);
+    }, []);
 
-  const handleCloseDialog = React.useCallback(() => {
-    setOpen(false);
-  }, []);
+    const handleCloseDialog = React.useCallback(() => {
+        setOpen(false);
+    }, []);
 
-  const handleClear = React.useCallback(
-    (e) => {
-      onClear({ e });
-      handleCloseDialog();
-    },
-    [onClear, handleCloseDialog]
-  );
+    const handleClear = React.useCallback(
+        (e) => {
+            onClear({e});
+            handleCloseDialog();
+        },
+        [onClear, handleCloseDialog]
+    );
 
-  return (
-    <Box display="flex">
-      <IconButton
-        icon="sync"
-        color="primary"
-        disabled={disabled}
-        onClick={handleOpenDialog}
-      ></IconButton>
-      <Dialog onClose={handleCloseDialog} open={open}>
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6">
-                {t("clearBoard")}
-              </Typography>
-              <Divider />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom>
-                {t("clearBoardConfirmation")}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="outlined" onClick={handleCloseDialog}>
-                {t("cancel")}
-              </Button>
-              &nbsp;
-              <Button color="primary" variant="contained" onClick={handleClear}>
-                {t("clear")}
-              </Button>
-            </Grid>
-          </Grid>
-        </DialogContent>
-      </Dialog>
-    </Box>
-  );
+    return (
+        <Box display="flex">
+            <IconButton
+                icon="sync"
+                color="primary"
+                disabled={disabled}
+                onClick={handleOpenDialog}
+            ></IconButton>
+            <Dialog onClose={handleCloseDialog} open={open}>
+                <DialogContent>
+                    <Grid container spacing={1}>
+                        <Grid item xs={12}>
+                            <Typography gutterBottom variant="h6">
+                                {t("clearBoard")}
+                            </Typography>
+                            <Divider/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography gutterBottom>
+                                {t("clearBoardConfirmation")}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button variant="outlined" onClick={handleCloseDialog}>
+                                {t("cancel")}
+                            </Button>
+                            &nbsp;
+                            <Button color="primary" variant="contained" onClick={handleClear}>
+                                {t("clear")}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+            </Dialog>
+        </Box>
+    );
 };
 
 // type LanguageButtonProps = {};
@@ -184,15 +184,15 @@ const ClearBoardButton: React.FC<ClearBoardButtonProps> = (props) => {
 // };
 
 const DarkThemeButton: React.FC<{}> = () => {
-  const { darkTheme, handleToggleDarkTheme } = useTheme();
+    const {darkTheme, handleToggleDarkTheme} = useTheme();
 
-  return (
-    <IconButton
-      color="inherit"
-      icon={darkTheme ? "invertColors" : "invertColorsOff"}
-      onClick={handleToggleDarkTheme}
-    />
-  );
+    return (
+        <IconButton
+            color="inherit"
+            icon={darkTheme ? "invertColors" : "invertColorsOff"}
+            onClick={handleToggleDarkTheme}
+        />
+    );
 };
 
 // const GitHubButton: React.FC<{}> = () => {
@@ -296,67 +296,72 @@ const DarkThemeButton: React.FC<{}> = () => {
 //   );
 // };
 const useToolbarStyles = makeStyles(() => ({
-  paper: {
-    padding: 0,
-  },
+    paper: {
+        padding: 0,
+    },
 }));
 
 type ToolbarProps = {
-  clearButtonDisabled?: boolean;
-  onNewColumn: any;
-  onClearBoard: any;
-  contentCardKanbanChange: any;
+    clearButtonDisabled?: boolean;
+    onNewColumn: any;
+    onClearBoard: any;
+    contentCardKanbanChange: any;
+    users: User[],
+    choosed: number
 };
 
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { clearButtonDisabled, onNewColumn, onClearBoard, contentCardKanbanChange } = props;
+    const {clearButtonDisabled, onNewColumn, onClearBoard, contentCardKanbanChange} = props;
 
-  // contentCardKanbanChange принимает значение поля клика, для того чтобы выбирать из массива данных нужные; так как на данный момент нет бэка, то мы с помощью contentCardKanbanChange отправляем конкретные тестовые данные в виде названий полей клика; они - как демонстрация возможностей
+    // contentCardKanbanChange принимает значение поля клика, для того чтобы выбирать из массива данных нужные; так как на данный момент нет бэка, то мы с помощью contentCardKanbanChange отправляем конкретные тестовые данные в виде названий полей клика; они - как демонстрация возможностей
 
-  const { t } = useTranslation();
+    const {t} = useTranslation();
 
-  const classes = useToolbarStyles();
+    const classes = useToolbarStyles();
 
-  const muiTheme = useMuiTheme();
+    const muiTheme = useMuiTheme();
 
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+    const stylesChoosed = {
+        borderBottom:"4px solid black"
+    }
+    return (
+        <AppBar color="default" elevation={6} className={classes.paper}>
+            <MuiToolbar>
+                <Box display="flex" alignItems="center">
+                    <IconButton
+                        icon="personalKanban"
+                        color="primary"
+                        size="small"
+                        iconProps={{fontSize: "large"}}
+                        disableRipple
+                        disableTouchRipple
+                        disableFocusRipple
+                    />
+                    &nbsp;
+                    <Typography variant={isMobile ? "body1" : "h6"}>
+                        <b>{t("OpenKanban")}</b>
+                    </Typography>
+                </Box>
+                <Box display="flex" flexGrow={1}/>
+                {
+                    props.users.map((item) => {
+                        return (<Tab key={item.id} style={item.id === props.choosed ? stylesChoosed : {}} label={item.name} onClick={() => contentCardKanbanChange(item.id)}/>)
+                    })
+                }
 
-  return (
-    <AppBar color="default" elevation={6} className={classes.paper}>
-      <MuiToolbar>
-        <Box display="flex" alignItems="center">
-          <IconButton
-            icon="personalKanban"
-            color="primary"
-            size="small"
-            iconProps={{ fontSize: "large" }}
-            disableRipple
-            disableTouchRipple
-            disableFocusRipple
-          />
-          &nbsp;
-          <Typography variant={isMobile ? "body1" : "h6"}>
-            <b>{t("OpenKanban")}</b>
-          </Typography>
-        </Box>
-        <Box display="flex" flexGrow={1} />
-
-          <Tab label="Сергей Бабин" onClick={() => contentCardKanbanChange("Сергей Бабин")} />
-          <Tab label="Александр Голубков" onClick={() => contentCardKanbanChange("Александр Голубков")} />
-          <Tab label="Александр Плаксюк" onClick={() => contentCardKanbanChange("Александр Плаксюк")} />
-        
-        <Box display="flex">
-          <AddColumnButton onSubmit={onNewColumn} />
-          &nbsp;
-          <ClearBoardButton
-            disabled={clearButtonDisabled}
-            onClear={onClearBoard}
-          />
-          <DarkThemeButton /> &nbsp;
-        </Box>
-      </MuiToolbar>
-    </AppBar>
-  );
+                <Box display="flex">
+                    <AddColumnButton onSubmit={onNewColumn}/>
+                    &nbsp;
+                    <ClearBoardButton
+                        disabled={clearButtonDisabled}
+                        onClear={onClearBoard}
+                    />
+                    <DarkThemeButton/> &nbsp;
+                </Box>
+            </MuiToolbar>
+        </AppBar>
+    );
 };
 
 export default Toolbar;

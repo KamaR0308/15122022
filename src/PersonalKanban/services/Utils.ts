@@ -1,7 +1,8 @@
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from "uuid";
 import moment from "moment";
 
-import { Column } from "PersonalKanban/types";
+import {Column, Record} from "PersonalKanban/types";
+import {RecordStatus} from "../enums";
 
 export const getId = (): string => {
   return uuidv4();
@@ -59,53 +60,33 @@ export const reorderCards = ({
   return newColumns;
 };
 
-export const getInitialState = (contentCard: any) => {
+export const getInitialState = (contentCard: Record[]) => {
   // содежимое блока формируем из приходящего значения
+  console.log(contentCard)
+  const filterCardsByStatus = (status: RecordStatus) => {
+    return contentCard.filter(item => item.status === status)
+  }
 
   return [
     {
       id: getId(),
       title: "В плане",
       color: "Orange",
-      records: [
-        {
-          id: getId(),
-          color: "White",
-          title: "⚙️" + contentCard[0].title,
-          description: contentCard[0].description,
-          createdAt: getCreatedAt(),
-        },
-      ],
+      records: filterCardsByStatus(RecordStatus.Plan),
       createdAt: getCreatedAt(),
     },
     {
       id: getId(),
       title: "В работе",
       color: "Blue",
-      records: [
-        {
-          id: getId(),
-          color: "White",
-          title: "⚙️" + contentCard[1].title,
-          description:  contentCard[1].description,
-          createdAt: getCreatedAt(),
-        },
-      ],  
+      records: filterCardsByStatus(RecordStatus.Progress),
       createdAt: getCreatedAt(),
     },
     {
       id: getId(),
       title: "На проверке",
       color: "Purple",
-      records: [
-        {
-          id: getId(),
-          color: "White",
-          title: "⚙️" + contentCard[2].title,
-          description: contentCard[2].description,
-          createdAt: getCreatedAt(),
-        },
-      ],
+      records: filterCardsByStatus(RecordStatus.Inspection),
       createdAt: getCreatedAt(),  
     },
   ];

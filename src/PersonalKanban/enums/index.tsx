@@ -8,6 +8,13 @@ import red from "@material-ui/core/colors/red";
 
 const RECORD_SHADE = 200;
 
+export enum RecordStatus {
+  Plan = "В плане",
+  Progress = "В работе",
+  Inspection = "На проверке"
+
+
+}
 export const RecordColor = {
   Purple: purple[RECORD_SHADE],
   Indigo: indigo[RECORD_SHADE],

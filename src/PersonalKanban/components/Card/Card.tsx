@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import { Record } from "PersonalKanban/types";
 import IconButton from "PersonalKanban/components/IconButton";
+import {TextField} from "@material-ui/core";
 
 const useStyles = makeStyles(() => ({
   paper: {
@@ -35,6 +36,7 @@ type CardProps = {
 };
 
 const Card: React.FC<CardProps> = (props) => {
+
   const {
     record,
     className,
@@ -56,6 +58,8 @@ const Card: React.FC<CardProps> = (props) => {
     record,
     onDelete,
   ]);
+  const [hoursState, setHoursState] = React.useState<number>(0)
+  const handleHoursState = React.useCallback((e) => e.target.value >= 0 ? setHoursState(e.target.value) : null, [hoursState])
 
   return (
     <Paper
@@ -73,7 +77,9 @@ const Card: React.FC<CardProps> = (props) => {
           {showDeleteAction && (
             <IconButton icon="deleteForever" onClick={handleDelete} />
           )}
+
         </Box>
+
       </Box>
       <Typography
         title={description}
@@ -81,11 +87,23 @@ const Card: React.FC<CardProps> = (props) => {
         variant="body2"
         gutterBottom
       >
-        {description}
+        <Box display="flex" flexDirection="column">
+          {description}
+          <TextField
+              id="outlined-name"
+              label="Время"
+              type={"number"}
+              value={hoursState}
+              style={{width: "50%"}}
+              onChange={handleHoursState}
+          />
+        </Box>
+
       </Typography>
       <Typography component="p" variant="caption" noWrap>
         {createdAt}
       </Typography>
+
     </Paper>
   );
 };
