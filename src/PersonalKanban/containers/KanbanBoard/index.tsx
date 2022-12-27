@@ -7,8 +7,15 @@ import {makeStyles} from "@material-ui/core/styles";
 
 import KanbanBoard from "PersonalKanban/components/KanbanBoard";
 import {Column, Record, User} from "PersonalKanban/types";
-import {getCreatedAt, getId, getInitialState, reorder, reorderCards,} from "PersonalKanban/services/Utils";
-import StorageService from "PersonalKanban/services/StorageService";
+import {
+    getCreatedAt,
+    getId,
+    getInitialState,
+    insertToPositionArr,
+    reorder,
+    reorderCards,
+} from "PersonalKanban/services/Utils";
+import StorageService, {getItem, setItem} from "PersonalKanban/services/StorageService";
 import Toolbar from "PersonalKanban/containers/Toolbar";
 import {RecordStatus} from "../../enums";
 
@@ -20,113 +27,10 @@ type KanbanBoardContainerProps = {};
 
 const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     let initialState = StorageService.getColumns();
-    const [usersState, setUsers] = React.useState<User[]>([
-        {
-            id: 1,
-            name: "Сергей Бабин",
-            records: [
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Сергея",
-                    title: "3456",
-                    status: RecordStatus.Plan
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Сергея",
-                    title: "3456",
-                    status: RecordStatus.Plan
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Сергея",
-                    title: "3456",
-                    status: RecordStatus.Progress
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 2й карточки Сергея",
-                    title: "3466",
-                    status: RecordStatus.Inspection
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 2й карточки Сергея",
-                    title: "3466",
-                    status: RecordStatus.Inspection
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 3й карточки Сергея",
-                    title: "3476",
-                    status: RecordStatus.Inspection
-                },
-                {id: getId(), description: "Принести ключ на 8", title: "34786", status: RecordStatus.Inspection},
-            ]
-        },
-        {
-            id: 2,
-            name: "Александр Голубков",
-            records: [
 
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Александра",
-                    title: "3456",
-                    status: RecordStatus.Plan
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Александра",
-                    title: "3456",
-                    status: RecordStatus.Progress
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 2й карточки Александра",
-                    title: "3466",
-                    status: RecordStatus.Progress
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 3й карточки Александра",
-                    title: "3476",
-                    status: RecordStatus.Progress
-                },
-                {id: getId(), description: "Принести ключ на 8", title: "34786", status: RecordStatus.Inspection},
-
-            ]
-        },
-        {
-            id: 3,
-            name: "Александр Плаксюк",
-            records: [
-                {
-                    id: getId(),
-                    description: "Содержимое 1й карточки Александра",
-                    title: "3456",
-                    status: RecordStatus.Plan
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 2й карточки Александра",
-                    title: "3466",
-                    status: RecordStatus.Progress
-                },
-                {
-                    id: getId(),
-                    description: "Содержимое 3й карточки Александра",
-                    title: "3476",
-                    status: RecordStatus.Inspection
-                },
-                {id: getId(), description: "Принести ключ на 8", title: "34786", status: RecordStatus.Inspection},
-
-            ]
-        }
-    ])
+    const [usersState, setUsers] = React.useState<User[]>(getItem('user_data') || [])
     const [choosedUserId, setChoosedUserId] = React.useState<number>(1)
-    // let initialState;
-    // здесь будет храниться содержимое только того канбана (ряд карточек определённого пользователя), которого выбрал пользователь
+
     const [contentCardKanban, setContentCardKanban] = React.useState<Record[]>([]);
 
     if (!initialState) {
@@ -144,7 +48,11 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     const [columns, setColumns] = React.useState<Column[]>(initialState);
 
     const classes = useKanbanBoardStyles();
+    React.useEffect(() => {
 
+        setItem('user_data', usersState)
+
+    }, [columns])
     const cloneColumns = React.useCallback((columns: Column[]) => {
         return columns.map((column: Column) => ({
             ...column,
@@ -190,6 +98,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             const updatedColumns = reorder(columns, getColumnIndex(column.id), index);
             setColumns(updatedColumns);
         },
+
         [columns, getColumnIndex]
     );
 
@@ -205,7 +114,9 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 columns[columnIndex].wipLimit = column.wipLimit;
                 return columns;
             });
+
         },
+
         [getColumnIndex, cloneColumns]
     );
 
@@ -232,6 +143,8 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             source: Column;
             record: Record;
         }) => {
+            const changedDT: string = new Date().toLocaleString().split(',').join("")
+            record.changedDate = changedDT
             const updatedColumns = reorderCards({
                 columns,
                 destinationColumn: column,
@@ -239,11 +152,41 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 sourceColumn: source,
                 sourceIndex: getRecordIndex(record.id, source.id)!,
             });
-
             setColumns(updatedColumns);
+
+            const bufferUsers: User[] = usersState
+            const chosenUser: User = usersState[choosedUserId - 1]
+            let bufferRecords: Record[] = []
+
+            //alert(index)
+
+            chosenUser.records.forEach((value) => {
+                if(value.id === record.id) {
+                    bufferRecords = chosenUser.records.filter(item => item.id !== record.id)
+                    bufferRecords.push({
+                        ...record,
+                        status: column.status,
+                        changedDate: changedDT
+                    })
+                }
+
+            })
+
+            //console.log(bufferRecords)
+            //console.log(column)
+            chosenUser.records = bufferRecords
+            bufferUsers[choosedUserId - 1] = chosenUser
+            //console.log(bufferUsers)
+           // alert('sas-2')
+            setUsers([...bufferUsers])
+            //alert('s')
         },
-        [columns, getRecordIndex]
+
+        [columns, getRecordIndex, usersState, props]
     );
+    React.useEffect(() => {
+        //alert('sas')
+    }, [usersState])
 
     const handleAddRecord = React.useCallback(
         ({column, record}: { column: Column; record: Record }) => {
@@ -259,12 +202,15 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                         color: record.color,
                         status: record.status,
                         createdAt: getCreatedAt(),
+                        changedDate: new Date().toLocaleDateString().split(',').join('')
                     },
                     ...columns[columnIndex].records,
                 ];
                 return columns;
             });
+
         },
+
         [cloneColumns, getColumnIndex]
     );
 
@@ -280,7 +226,10 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 _record.color = record.color;
                 return columns;
             });
+
         },
+
+
         [getColumnIndex, getRecordIndex, cloneColumns]
     );
 
@@ -321,55 +270,6 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         let userData;
         setChoosedUserId(dataClick)
         setContentCardKanban(usersState.filter(item => item.id === dataClick)[0].records);
-        // if (dataClick === "Сергей Бабин") {
-        //     userData = [
-        //         {id: getId(), description: "Содержимое 1й карточки Сергея", title: "3456", status: RecordStatus.Plan},
-        //         {
-        //             id: getId(),
-        //             description: "Содержимое 2й карточки Сергея",
-        //             title: "3466",
-        //             status: RecordStatus.Progress
-        //         },
-        //         {
-        //             id: getId(),
-        //             description: "Содержимое 3й карточки Сергея",
-        //             title: "3476",
-        //             status: RecordStatus.Inspection
-        //         },
-        //         {id: getId(), description: "Принести ключ на 8", title: "34786", status: RecordStatus.Inspection},
-        //     ]
-        //
-        //     setContentCardKanban(userData);
-        // } else if (dataClick === "Александр Голубков") {
-        //     userData = [
-        //         {id: getId(), description: "Содержимое 1й карточки Алекса", title: "4456", status: RecordStatus.Plan},
-        //         {
-        //             id: getId(),
-        //             description: "Содержимое 2й карточки Алекса",
-        //             title: "4466",
-        //             status: RecordStatus.Progress
-        //         },
-        //         {
-        //             id: getId(),
-        //             description: "Содержимое 3й карточки Алекса",
-        //             title: "4476",
-        //             status: RecordStatus.Inspection
-        //         },
-        //     ]
-        //
-        //     setContentCardKanban(userData);
-        // } else if (dataClick === "Александр Плаксюк") {
-        //     userData = [
-        //         {id: getId(), description: "Содержимое 1й карточки Саши", title: "5456", status: RecordStatus.Plan},
-        //         {id: getId(), description: "Содержимое 2й карточки Саши", title: "5466", status: RecordStatus.Progress},
-        //         {
-        //             id: getId(),
-        //             description: "Содержимое 3й карточки Саши",
-        //             title: "5476",
-        //             status: RecordStatus.Inspection
-        //         },
-        //     ]
-
 
     }
     React.useEffect(() => {

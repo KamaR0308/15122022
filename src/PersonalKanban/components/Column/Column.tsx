@@ -156,7 +156,9 @@ export const ColumnCardList: React.FC<ColumnCardListProps> = (props) => {
   const { t } = useTranslation();
 
   const classes = useColumnCardListStyles();
-
+  React.useEffect(() => {
+      console.log(records)
+  }, [])
   return (
     <div ref={innerRef}>
       {records && records.length ? (

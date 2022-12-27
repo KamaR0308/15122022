@@ -14,6 +14,10 @@ export type Record = {
   status: RecordStatus
   color?: string;
   createdAt?: string;
+  estimated_time?: number;
+  start_date?: string
+  end_date?: string
+  changedDate: string
 };
 
 export type Column = {
@@ -21,6 +25,7 @@ export type Column = {
   title: string;
   description?: string;
   caption?: string;
+  status: RecordStatus
   color?: string;
   records?: Record[];
   wipLimit?: number;

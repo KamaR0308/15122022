@@ -59,7 +59,18 @@ export const reorderCards = ({
   newColumns[getColumnIndex(destinationColumn.id)].records = next;
   return newColumns;
 };
-
+export const insertToPositionArr = (arr: any[], data: any, position: number)  => {
+  if (position >= arr.length) {
+    arr.push(data) // Put at the end if position is more than total length of array
+  } else if (position <= 0) {
+    arr.unshift(data) // Put at the start if position is less than or equal to 0
+  } else { // Shift all elements to right
+    for (let i = arr.length; i >= position; i--) {
+      arr[i] = arr[i - 1];
+    }
+    arr[position] = data;
+  }
+}
 export const getInitialState = (contentCard: Record[]) => {
   // содежимое блока формируем из приходящего значения
   console.log(contentCard)
@@ -72,6 +83,7 @@ export const getInitialState = (contentCard: Record[]) => {
       id: getId(),
       title: "В плане",
       color: "Orange",
+      status: RecordStatus.Plan,
       records: filterCardsByStatus(RecordStatus.Plan),
       createdAt: getCreatedAt(),
     },
@@ -79,13 +91,16 @@ export const getInitialState = (contentCard: Record[]) => {
       id: getId(),
       title: "В работе",
       color: "Blue",
+      status: RecordStatus.Progress,
       records: filterCardsByStatus(RecordStatus.Progress),
       createdAt: getCreatedAt(),
     },
     {
+
       id: getId(),
       title: "На проверке",
       color: "Purple",
+      status: RecordStatus.Inspection,
       records: filterCardsByStatus(RecordStatus.Inspection),
       createdAt: getCreatedAt(),  
     },

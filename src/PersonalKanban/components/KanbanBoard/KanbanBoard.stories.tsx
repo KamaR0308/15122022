@@ -2,14 +2,17 @@ import React from "react";
 import faker from "faker";
 
 import KanbanBoard from "PersonalKanban/components/KanbanBoard";
-import { Column, Record } from "PersonalKanban/types";
-import { getId, reorder, reorderCards } from "PersonalKanban/services/Utils";
+import {Column, Record} from "PersonalKanban/types";
+import {getId, reorder, reorderCards} from "PersonalKanban/services/Utils";
+import {RecordStatus} from "../../enums";
 
 const getCards = (count: number): Record[] => {
   return new Array(count).fill(0).map(() => ({
     id: getId(),
     title: faker.lorem.word(),
     description: faker.lorem.sentence(),
+    status: RecordStatus.Inspection,
+    changedDate: new Date()
   }));
 };
 
@@ -19,15 +22,18 @@ const getColumns = (): Column[] => {
       id: getId(),
       title: "Todo",
       records: getCards(10),
+      status: RecordStatus.Inspection,
     },
     {
       id: getId(),
       title: "In-Progress",
       records: getCards(11),
+      status: RecordStatus.Inspection,
     },
     {
       id: getId(),
       title: "Completed",
+      status: RecordStatus.Inspection,
       records: getCards(12),
     },
   ];
