@@ -8,6 +8,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Record} from "PersonalKanban/types";
 import IconButton from "PersonalKanban/components/IconButton";
 import {TextField} from "@material-ui/core";
+import {RecordContext} from "../../containers/KanbanBoard";
 
 const useStyles = makeStyles(() => ({
     paper: {
@@ -35,7 +36,7 @@ type CardProps = {
 };
 
 const Card: React.FC<CardProps> = (props) => {
-
+    const {handleRecordHours} = React.useContext(RecordContext)
     const {
         record,
         className,
@@ -59,8 +60,16 @@ const Card: React.FC<CardProps> = (props) => {
         record,
         onDelete,
     ]);
-    const [hoursState, setHoursState] = React.useState<number>(0)
-    const handleHoursState = React.useCallback((e) => e.target.value >= 0 ? setHoursState(e.target.value) : null, [hoursState])
+
+    const [hoursState, setHoursState] = React.useState<number>(record.hours || 0)
+
+    const handleHoursState = React.useCallback((e) => {
+        if(e.target.value >= 0){
+            setHoursState(e.target.value)
+        }
+        handleRecordHours(record.id, Number(e.target.value))
+
+    }, [hoursState])
     useEffect(() => {
         console.log('render_card', record)
     }, [])

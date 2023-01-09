@@ -25,6 +25,13 @@ const useKanbanBoardStyles = makeStyles((theme) => ({
 
 type KanbanBoardContainerProps = {};
 
+export interface IRecordContext {
+    handleRecordHours: (idRecord: string, hours: number) => void
+}
+
+export const RecordContext = React.createContext<IRecordContext>({
+    handleRecordHours(idRecord: string, hours: number): void {}
+})
 const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     let initialState = StorageService.getColumns();
 
@@ -161,7 +168,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             //alert(index)
 
             chosenUser.records.forEach((value) => {
-                if(value.id === record.id) {
+                if (value.id === record.id) {
                     bufferRecords = chosenUser.records.filter(item => item.id !== record.id)
                     bufferRecords.push({
                         ...record,
@@ -177,7 +184,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             chosenUser.records = bufferRecords
             bufferUsers[choosedUserId - 1] = chosenUser
             //console.log(bufferUsers)
-           // alert('sas-2')
+            // alert('sas-2')
             setUsers([...bufferUsers])
             //alert('s')
         },
@@ -185,9 +192,16 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         [columns, getRecordIndex, usersState, props]
     );
     React.useEffect(() => {
-        //alert('sas')
-    }, [usersState])
 
+    }, [usersState])
+    const handleRecordHours = React.useCallback((idRecord: string, hours: number) => {
+        const cloneUsersState = usersState
+        const indexRecord = cloneUsersState[choosedUserId - 1].records.findIndex(item => item.id === idRecord)
+        cloneUsersState[choosedUserId - 1].records[indexRecord].hours = hours
+        setUsers([...cloneUsersState])
+        setItem('user_data', cloneUsersState)
+
+    }, [choosedUserId])
     const handleAddRecord = React.useCallback(
         ({column, record}: { column: Column; record: Record }) => {
             const columnIndex = getColumnIndex(column.id);
@@ -200,6 +214,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                         title: record.title,
                         description: record.description,
                         color: record.color,
+                        hours: 0,
                         status: record.status,
                         createdAt: getCreatedAt(),
                         changedDate: new Date().toLocaleDateString().split(',').join('')
@@ -228,7 +243,6 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             });
 
         },
-
 
         [getColumnIndex, getRecordIndex, cloneColumns]
     );
@@ -277,7 +291,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     }, [])
 
     return (
-        <>
+        <RecordContext.Provider value={{handleRecordHours}}>
             <Toolbar
                 clearButtonDisabled={!columns.length}
                 onNewColumn={handleAddColumn}
@@ -300,11 +314,9 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                     onAllRecordDelete={handleAllRecordDelete}
                 />
             </Box>
-        </>
+        </RecordContext.Provider>
     )
 };
-
-
 
 
 export default KanbanBoardContainer;

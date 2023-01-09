@@ -33,12 +33,13 @@ const data = [
     {
         id: 1,
         name: "Сергей Бабин",
-        records: [
+        records:  [
             {
                 id: getId(),
                 description: "Содержимое 1й карточки Сергея",
                 title: "3456",
                 status: RecordStatus.Plan,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -49,6 +50,7 @@ const data = [
                 changedDate: new Date().toLocaleString().split(',').join(''),
                 estimated_time: 3,
                 start_date: "27.12.2022",
+                hours: 0,
                 end_date: "28.12.2022"
             },
             {
@@ -58,6 +60,7 @@ const data = [
                 status: RecordStatus.Plan,
                 changedDate: new Date().toLocaleString().split(',').join(''),
                 estimated_time: 5,
+                hours: 0,
                 start_date: "27.12.2022",
                 end_date: "28.12.2022"
             },
@@ -66,6 +69,7 @@ const data = [
                 description: "Содержимое 1й карточки Сергея",
                 title: "3456",
                 status: RecordStatus.Plan,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -73,6 +77,7 @@ const data = [
                 description: "Содержимое 1й карточки Сергея",
                 title: "3456",
                 status: RecordStatus.Progress,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -80,6 +85,7 @@ const data = [
                 description: "Содержимое 2й карточки Сергея",
                 title: "3466",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -87,6 +93,7 @@ const data = [
                 description: "Содержимое 2й карточки Сергея",
                 title: "3466",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -94,6 +101,7 @@ const data = [
                 description: "Содержимое 3й карточки Сергея",
                 title: "3476",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
             {
@@ -101,6 +109,7 @@ const data = [
                 description: "Принести ключ на 8",
                 title: "34786",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate: new Date().toLocaleString().split(',').join('')
             },
         ]
@@ -118,6 +127,7 @@ const data = [
                 changedDate: new Date().toLocaleString().split(',').join(''),
                 estimated_time: 2,
                 start_date: "23.12.2022",
+                hours: 0,
                 end_date: "24.12.2022"
             },
             {
@@ -125,6 +135,7 @@ const data = [
                 description: "Содержимое 1й карточки Александра",
                 title: "3456",
                 status: RecordStatus.Progress,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
             {
@@ -132,6 +143,7 @@ const data = [
                 description: "Содержимое 2й карточки Александра",
                 title: "3466",
                 status: RecordStatus.Progress,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
             {
@@ -139,6 +151,7 @@ const data = [
                 description: "Содержимое 3й карточки Александра",
                 title: "3476",
                 status: RecordStatus.Progress,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
             {
@@ -146,6 +159,7 @@ const data = [
                 description: "Принести ключ на 8",
                 title: "34786",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
 
@@ -160,6 +174,7 @@ const data = [
                 description: "Содержимое 1й карточки Александра",
                 title: "3456",
                 status: RecordStatus.Plan,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
             {
@@ -167,6 +182,7 @@ const data = [
                 description: "Содержимое 2й карточки Александра",
                 title: "3466",
                 status: RecordStatus.Progress,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
             {
@@ -174,9 +190,10 @@ const data = [
                 description: "Содержимое 3й карточки Александра",
                 title: "3476",
                 status: RecordStatus.Inspection,
+                hours: 0,
                 changedDate:new Date().toLocaleString().split(',').join('')
             },
-            {id: getId(), description: "Принести ключ на 8", title: "34786", status: RecordStatus.Inspection,  changedDate:new Date().toLocaleString().split(',').join('')},
+            {id: getId(), description: "Принести ключ на 8", title: "34786", hours: 0, status: RecordStatus.Inspection,  changedDate:new Date().toLocaleString().split(',').join('')},
 
         ]
     }
