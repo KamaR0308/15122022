@@ -71,7 +71,7 @@ const Card: React.FC<CardProps> = (props) => {
 
     }, [hoursState])
     useEffect(() => {
-        console.log('render_card', record)
+        //console.log('render_card', record)
     }, [])
     return (
         <Paper

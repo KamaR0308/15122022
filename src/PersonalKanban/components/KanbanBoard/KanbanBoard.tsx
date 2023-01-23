@@ -22,7 +22,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = (props) => {
   const {
     columns,
     onCardMove,
-    onColumnMove,
     onColumnEdit,
     onColumnDelete,
     onAddRecord,
@@ -58,13 +57,13 @@ const KanbanBoard: React.FC<KanbanBoardProps> = (props) => {
         return;
       }
 
-      if (type === "COLUMN") {
-        onColumnMove({
-          column: getColumnByIndex(source.index),
-          index: destination.index,
-        });
-        return;
-      }
+      // if (type === "COLUMN") {
+      //   onColumnMove({
+      //     column: getColumnByIndex(source.index),
+      //     index: destination.index,
+      //   });
+      //   return;
+      // }
 
       const record = getColumnById(source.droppableId)?.records?.[source.index];
 
@@ -75,7 +74,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = (props) => {
         index: destination.index,
       });
     },
-    [onColumnMove, onCardMove, getColumnByIndex, getColumnById]
+    [onCardMove, getColumnByIndex, getColumnById]
   );
 
   return (

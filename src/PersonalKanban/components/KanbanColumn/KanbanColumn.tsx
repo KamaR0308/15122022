@@ -86,10 +86,8 @@ const KanbanColumn: React.FC<KanbanColumnProps> = (props) => {
   });
 
   return (
-    <Draggable draggableId={column.id} index={index}>
-      {(provided) => (
+
         <Column
-          innerRef={provided.innerRef}
           column={_column}
           className={className}
           ColumnCardListComponent={KanbanColumnCardList}
@@ -99,11 +97,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = (props) => {
           onRecordEdit={onRecordEdit}
           onRecordDelete={onRecordDelete}
           onAllRecordDelete={onAllRecordDelete}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
         />
-      )}
-    </Draggable>
   );
 };
 

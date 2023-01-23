@@ -1,6 +1,6 @@
 // Пожалуйста, оптимизируйте код. Читать и масштабировать очень сложно. Как минимум, вам нужно разбить компоненты на подкомпоненты. Вдобавок - желательно комментировать код, как делаю я.
 
-import React from "react";
+import React, {useEffect} from "react";
 
 import Box from "@material-ui/core/Box";
 import {makeStyles} from "@material-ui/core/styles";
@@ -8,16 +8,19 @@ import {makeStyles} from "@material-ui/core/styles";
 import KanbanBoard from "PersonalKanban/components/KanbanBoard";
 import {Column, Record, User} from "PersonalKanban/types";
 import {
+    checkColumnsEmpty,
     getCreatedAt,
     getId,
-    getInitialState,
-    insertToPositionArr,
-    reorder,
+    getInitialState, getMovedUsers, getUsersFromResponse,
     reorderCards,
 } from "PersonalKanban/services/Utils";
 import StorageService, {getItem, setItem} from "PersonalKanban/services/StorageService";
 import Toolbar from "PersonalKanban/containers/Toolbar";
-import {RecordStatus} from "../../enums";
+
+import useFetch from "../../hooks/useFetch";
+import {OpenProjectService} from "../../../Api/OpenProjectService";
+
+import {defaultUsersData} from "../../../index";
 
 const useKanbanBoardStyles = makeStyles((theme) => ({
     toolbar: theme.mixins.toolbar,
@@ -30,36 +33,37 @@ export interface IRecordContext {
 }
 
 export const RecordContext = React.createContext<IRecordContext>({
-    handleRecordHours(idRecord: string, hours: number): void {}
-})
-const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
-    let initialState = StorageService.getColumns();
-
-    const [usersState, setUsers] = React.useState<User[]>(getItem('user_data') || [])
-    const [choosedUserId, setChoosedUserId] = React.useState<number>(1)
-
-    const [contentCardKanban, setContentCardKanban] = React.useState<Record[]>([]);
-
-    if (!initialState) {
-        initialState = getInitialState(contentCardKanban);
+    handleRecordHours(idRecord: string, hours: number): void {
     }
+})
 
-    React.useEffect(() => {
-        // когда state поменялся, меняем содержимое карточек и получаем уже обновлённое
-        initialState = getInitialState(contentCardKanban);
+const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
+    let initialState = StorageService.getColumns() || [];
 
-        // и обновляем сами карточки
-        setColumns(initialState);
-    }, [contentCardKanban]);
+    const classes = useKanbanBoardStyles();
+
+    const [usersState, setUsers] = React.useState<User[]>(defaultUsersData)
+
+    const [choosedUserId, setChoosedUserId] = React.useState<number>(1)
+    const [contentCardKanban, setContentCardKanban] = React.useState<Record[]>([]);
 
     const [columns, setColumns] = React.useState<Column[]>(initialState);
 
-    const classes = useKanbanBoardStyles();
-    React.useEffect(() => {
+    if (!initialState) {
+        initialState = getInitialState(contentCardKanban);
 
-        setItem('user_data', usersState)
+    }
+    const {req, loading} = useFetch(() => {
 
-    }, [columns])
+        OpenProjectService.getAllTasks().then(res => {
+            const users = getUsersFromResponse(defaultUsersData, res)
+            setUsers(users)
+            StorageService.setUsers(users)
+            contentCardKanbanChange(choosedUserId)
+
+        })
+    })
+
     const cloneColumns = React.useCallback((columns: Column[]) => {
         return columns.map((column: Column) => ({
             ...column,
@@ -100,14 +104,14 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         []
     );
 
-    const handleColumnMove = React.useCallback(
-        ({column, index}: { column: Column; index: number }) => {
-            const updatedColumns = reorder(columns, getColumnIndex(column.id), index);
-            setColumns(updatedColumns);
-        },
-
-        [columns, getColumnIndex]
-    );
+    // const handleColumnMove = React.useCallback(
+    //     ({column, index}: { column: Column; index: number }) => {
+    //         const updatedColumns = reorder(columns, getColumnIndex(column.id), index);
+    //         setColumns(updatedColumns);
+    //     },
+    //
+    //     [columns, getColumnIndex]
+    // );
 
     const handleColumnEdit = React.useCallback(
         ({column}: { column: Column }) => {
@@ -161,47 +165,19 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
             });
             setColumns(updatedColumns);
 
-            const bufferUsers: User[] = usersState
-            const chosenUser: User = usersState[choosedUserId - 1]
-            let bufferRecords: Record[] = []
-
-            //alert(index)
-
-            chosenUser.records.forEach((value) => {
-                if (value.id === record.id) {
-                    bufferRecords = chosenUser.records.filter(item => item.id !== record.id)
-                    bufferRecords.push({
-                        ...record,
-                        status: column.status,
-                        changedDate: changedDT
-                    })
-                }
-
-            })
-
-            //console.log(bufferRecords)
-            //console.log(column)
-            chosenUser.records = bufferRecords
-            bufferUsers[choosedUserId - 1] = chosenUser
-            //console.log(bufferUsers)
-            // alert('sas-2')
+            const bufferUsers = getMovedUsers(usersState, choosedUserId, record, column, changedDT)
             setUsers([...bufferUsers])
-            //alert('s')
         },
 
         [columns, getRecordIndex, usersState, props]
     );
-    React.useEffect(() => {
-
-    }, [usersState])
     const handleRecordHours = React.useCallback((idRecord: string, hours: number) => {
         const cloneUsersState = usersState
         const indexRecord = cloneUsersState[choosedUserId - 1].records.findIndex(item => item.id === idRecord)
         cloneUsersState[choosedUserId - 1].records[indexRecord].hours = hours
         setUsers([...cloneUsersState])
-        setItem('user_data', cloneUsersState)
-
     }, [choosedUserId])
+
     const handleAddRecord = React.useCallback(
         ({column, record}: { column: Column; record: Record }) => {
             const columnIndex = getColumnIndex(column.id);
@@ -271,29 +247,32 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         },
         [cloneColumns, getColumnIndex]
     );
-
     React.useEffect(() => {
         StorageService.setColumns(columns);
-    }, [columns]);
+    }, [columns, contentCardKanban]);
+
+    React.useEffect(() => {
+        initialState = getInitialState(contentCardKanban);
+        setColumns(initialState);
+        StorageService.setUsers(usersState)
+    }, [contentCardKanban, usersState]);
 
     const contentCardKanbanChange = (dataClick: number) => {
         // здесь находится функционал, меняющий содержимое канбана
-
         // в данном случае после клика, используя полученное значение, находим нужные данные и сохраняем в state приложения
-
-        let userData;
         setChoosedUserId(dataClick)
         setContentCardKanban(usersState.filter(item => item.id === dataClick)[0].records);
-
     }
     React.useEffect(() => {
+        req()
         contentCardKanbanChange(choosedUserId)
     }, [])
 
     return (
         <RecordContext.Provider value={{handleRecordHours}}>
+
             <Toolbar
-                clearButtonDisabled={!columns.length}
+                clearButtonDisabled={!columns?.length}
                 onNewColumn={handleAddColumn}
                 onClearBoard={handleClearBoard}
                 users={usersState}
@@ -301,18 +280,23 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 contentCardKanbanChange={contentCardKanbanChange}
             />
             <div className={classes.toolbar}/>
+
             <Box padding={1}>
-                <KanbanBoard
-                    columns={columns}
-                    onColumnMove={handleColumnMove}
-                    onColumnEdit={handleColumnEdit}
-                    onColumnDelete={handleColumnDelete}
-                    onCardMove={handleCardMove}
-                    onAddRecord={handleAddRecord}
-                    onRecordEdit={handleRecordEdit}
-                    onRecordDelete={handleRecordDelete}
-                    onAllRecordDelete={handleAllRecordDelete}
-                />
+                {
+                    !loading && !checkColumnsEmpty(columns) ?
+                        <KanbanBoard
+                            columns={columns}
+                            onColumnEdit={handleColumnEdit}
+                            onColumnDelete={handleColumnDelete}
+                            onCardMove={handleCardMove}
+                            onAddRecord={handleAddRecord}
+                            onRecordEdit={handleRecordEdit}
+                            onRecordDelete={handleRecordDelete}
+                            onAllRecordDelete={handleAllRecordDelete}
+                        /> :
+                        null
+                }
+
             </Box>
         </RecordContext.Provider>
     )
