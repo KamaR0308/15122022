@@ -10,7 +10,7 @@ export const getId = (): string => {
     return uuidv4();
 };
 export const checkColumnsEmpty = (columns: Column[]) =>{
-    return columns[0]?.records?.length || columns[1]?.records?.length || columns[2]?.records?.length
+    return columns.every(col => col.records?.length)
 }
 
 export const getMovedUsers = (usersState: User[], choosedUserId: number, record: Record, column: Column, changedDT: string) => {

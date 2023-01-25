@@ -53,14 +53,13 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         initialState = getInitialState(contentCardKanban);
 
     }
-    const {req, loading} = useFetch(() => {
-
+    const {req, loading, setLoading} = useFetch(() => {
         OpenProjectService.getAllTasks().then(res => {
             const users = getUsersFromResponse(defaultUsersData, res)
             setUsers(users)
-            StorageService.setUsers(users)
             contentCardKanbanChange(choosedUserId)
-
+        }).then(() => {
+            setLoading(false)
         })
     })
 
@@ -86,6 +85,12 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         },
         [columns, getColumnIndex]
     );
+    const contentCardKanbanChange = (dataClick: number) => {
+        // здесь находится функционал, меняющий содержимое канбана
+        // в данном случае после клика, используя полученное значение, находим нужные данные и сохраняем в state приложения
+        setChoosedUserId(dataClick)
+        setContentCardKanban(usersState.filter(item => item.id === dataClick)[0].records);
+    }
 
     const handleClearBoard = React.useCallback(() => {
         setColumns([]);
@@ -164,7 +169,6 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 sourceIndex: getRecordIndex(record.id, source.id)!,
             });
             setColumns(updatedColumns);
-
             const bufferUsers = getMovedUsers(usersState, choosedUserId, record, column, changedDT)
             setUsers([...bufferUsers])
         },
@@ -252,21 +256,12 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     }, [columns, contentCardKanban]);
 
     React.useEffect(() => {
+        req()
+    }, [])
+    React.useEffect(() => {
         initialState = getInitialState(contentCardKanban);
         setColumns(initialState);
-        StorageService.setUsers(usersState)
     }, [contentCardKanban, usersState]);
-
-    const contentCardKanbanChange = (dataClick: number) => {
-        // здесь находится функционал, меняющий содержимое канбана
-        // в данном случае после клика, используя полученное значение, находим нужные данные и сохраняем в state приложения
-        setChoosedUserId(dataClick)
-        setContentCardKanban(usersState.filter(item => item.id === dataClick)[0].records);
-    }
-    React.useEffect(() => {
-        req()
-        contentCardKanbanChange(choosedUserId)
-    }, [])
 
     return (
         <RecordContext.Provider value={{handleRecordHours}}>
@@ -283,7 +278,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
 
             <Box padding={1}>
                 {
-                    !loading && !checkColumnsEmpty(columns) ?
+                    !loading ?
                         <KanbanBoard
                             columns={columns}
                             onColumnEdit={handleColumnEdit}
@@ -294,7 +289,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                             onRecordDelete={handleRecordDelete}
                             onAllRecordDelete={handleAllRecordDelete}
                         /> :
-                        null
+                        <p>Загрузка</p>
                 }
 
             </Box>

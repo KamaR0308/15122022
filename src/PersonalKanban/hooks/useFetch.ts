@@ -1,27 +1,34 @@
-import {useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 
 interface IFetchResult {
     req: () => void,
     loading: boolean,
-    error: string
+    error: string,
+    setLoading:  Dispatch<SetStateAction<boolean>>
 
 }
-const useFetch = (callback: CallableFunction): IFetchResult => {
-    const [loading, setLoading] = useState<boolean>(false)
+interface IOptions {
+    autoSetLoading: boolean
+}
+const useFetch = (callback: CallableFunction, options?: IOptions): IFetchResult => {
+    const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string>('')
 
-    const req = (): void => {
+    const req = async () => {
         try {
-            setLoading(true)
             callback()
         } catch (e) {
             const err_ = e as Error
             setError(err_.message)
+
         } finally {
-            setLoading(false)
+            if (options?.autoSetLoading) {
+                setLoading(false)
+            }
         }
     }
-    return {req, loading, error}
+
+    return {req, loading, setLoading, error}
 }
 
 export default useFetch
