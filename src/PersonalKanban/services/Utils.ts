@@ -3,8 +3,6 @@ import moment from "moment";
 
 import {Column, Record, User} from "PersonalKanban/types";
 import {RecordStatus} from "../enums";
-import {defaultUsersData} from "../../index";
-import data from "../../response.json";
 
 export const getId = (): string => {
     return uuidv4();
@@ -33,18 +31,25 @@ export const getMovedUsers = (usersState: User[], choosedUserId: number, record:
     bufferUsers[choosedUserId - 1] = chosenUser
     return bufferUsers
 }
+const valueExistsInStatus = (status: string) => {
+    const values = Object.values(RecordStatus);
+    return values.includes(status as RecordStatus) ? status as RecordStatus : false
+}
 export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[] => {
     const tempUsersData: User[] = defaultUsersData
-    data._embedded.elements?.forEach((item: { _links: { customField6: { title: string; }; }; subject: any; description: { raw: any; }; startDate: any; dueDate: any; updatedAt: string | number | Date; }) => {
+    data._embedded.elements?.forEach((item: { _links: { customField6: { title: string; }; status: {title: string} }; id: number, subject: any; description: { raw: any; }; startDate: any; lockVersion: number; dueDate: any; updatedAt: string | number | Date; }) => {
         const userIndex = tempUsersData.findIndex(user => user.name === item._links?.customField6?.title)
 
-        if (userIndex >= 0) {
+        if (userIndex >= 0 && valueExistsInStatus(item._links.status.title)) {
+            const taskStatus = valueExistsInStatus(item._links.status.title) as RecordStatus
 
             tempUsersData[userIndex].records.push({
+                item_id: item.id,
+                lockVersion: item.lockVersion,
                 id: getId(),
                 title: item.subject,
                 description: item.description.raw || "",
-                status: RecordStatus.Plan,
+                status: taskStatus,
                 estimated_time: 0,
                 start_date: item.startDate || "",
                 end_date: item.dueDate || "",

@@ -261,7 +261,8 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
     React.useEffect(() => {
         initialState = getInitialState(contentCardKanban);
         setColumns(initialState);
-    }, [contentCardKanban, usersState]);
+        StorageService.setUsers(usersState)
+    }, [contentCardKanban]);
 
     return (
         <RecordContext.Provider value={{handleRecordHours}}>

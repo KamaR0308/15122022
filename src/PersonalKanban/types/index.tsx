@@ -7,6 +7,8 @@ export type User = {
 }
 
 export type Record = {
+  item_id?: number;
+  lockVersion?: number;
   id: string;
   title: string;
   description?: string;
