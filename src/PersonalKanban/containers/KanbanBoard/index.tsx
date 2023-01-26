@@ -21,6 +21,7 @@ import useFetch from "../../hooks/useFetch";
 import {OpenProjectService} from "../../../Api/OpenProjectService";
 
 import {defaultUsersData} from "../../../index";
+import {COLUMNS_STATUSES} from "../../constants";
 
 const useKanbanBoardStyles = makeStyles((theme) => ({
     toolbar: theme.mixins.toolbar,
@@ -168,6 +169,16 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
                 sourceColumn: source,
                 sourceIndex: getRecordIndex(record.id, source.id)!,
             });
+            const newStatusUrl = COLUMNS_STATUSES.filter(item => item.status === column.status)[0].link
+            OpenProjectService.updateTask({
+                lockVersion: record.lockVersion,
+                _links: {
+                    status: {
+                        href: newStatusUrl
+                    }
+                }
+            }, record.item_id)
+
             setColumns(updatedColumns);
             const bufferUsers = getMovedUsers(usersState, choosedUserId, record, column, changedDT)
             setUsers([...bufferUsers])
