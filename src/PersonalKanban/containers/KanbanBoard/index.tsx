@@ -270,7 +270,10 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         req()
     }, [])
     React.useEffect(() => {
-        initialState = getInitialState(contentCardKanban);
+        initialState = getInitialState(contentCardKanban.sort((a, b) => {
+            // @ts-ignore
+            return new Date(b.start_date) - new Date(a.start_date)
+        }));
         setColumns(initialState);
         StorageService.setUsers(usersState)
     }, [contentCardKanban]);

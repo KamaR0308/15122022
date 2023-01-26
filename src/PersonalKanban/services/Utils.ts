@@ -27,7 +27,10 @@ export const getMovedUsers = (usersState: User[], choosedUserId: number, record:
         }
 
     })
-    chosenUser.records = bufferRecords
+    chosenUser.records = bufferRecords.sort(function(a,b){
+        // @ts-ignore
+        return new Date(a.start_date) - new Date(b.start_date)
+    });
     bufferUsers[choosedUserId - 1] = chosenUser
     return bufferUsers
 }
@@ -47,8 +50,8 @@ export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[
                 item_id: item.id,
                 lockVersion: item.lockVersion,
                 id: getId(),
-                title: item.subject,
-                description: item.description.raw || "",
+                title: String(item.id),
+                description: item.subject || "",
                 status: taskStatus,
                 estimated_time: 0,
                 start_date: item.startDate || "",
