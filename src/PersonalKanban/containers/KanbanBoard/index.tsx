@@ -55,6 +55,7 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
 
     }
     const {req, loading, setLoading} = useFetch(() => {
+        //Получение задач с OpenProject, которые при попадании в resolve попадут в состояния.
         OpenProjectService.getAllTasks().then(res => {
             const users = getUsersFromResponse(defaultUsersData, res)
             setUsers(users)
