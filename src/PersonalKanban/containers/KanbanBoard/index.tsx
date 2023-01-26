@@ -1,5 +1,5 @@
 // Пожалуйста, оптимизируйте код. Читать и масштабировать очень сложно. Как минимум, вам нужно разбить компоненты на подкомпоненты. Вдобавок - желательно комментировать код, как делаю я.
-
+import {serialize} from "tinyduration";
 import React, {useEffect} from "react";
 
 import Box from "@material-ui/core/Box";
@@ -191,6 +191,12 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         const cloneUsersState = usersState
         const indexRecord = cloneUsersState[choosedUserId - 1].records.findIndex(item => item.id === idRecord)
         cloneUsersState[choosedUserId - 1].records[indexRecord].hours = hours
+        OpenProjectService.updateTask({
+            lockVersion: cloneUsersState[choosedUserId - 1].records[indexRecord].lockVersion,
+            spentTime: serialize({
+                hours: hours
+            })
+        }, cloneUsersState[choosedUserId - 1].records[indexRecord].item_id)
         setUsers([...cloneUsersState])
     }, [choosedUserId])
 

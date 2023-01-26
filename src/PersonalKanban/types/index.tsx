@@ -17,7 +17,7 @@ export type Record = {
   color?: string;
   createdAt?: string;
   estimated_time?: number;
-  hours: number;
+  hours?: number;
   start_date?: string
   end_date?: string
   changedDate: string

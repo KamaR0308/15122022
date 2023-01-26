@@ -3,6 +3,9 @@ import moment from "moment";
 
 import {Column, Record, User} from "PersonalKanban/types";
 import {RecordStatus} from "../enums";
+import { parse, serialize } from 'tinyduration';
+
+// Basic parsing
 
 export const getId = (): string => {
     return uuidv4();
@@ -40,7 +43,7 @@ const valueExistsInStatus = (status: string) => {
 }
 export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[] => {
     const tempUsersData: User[] = defaultUsersData
-    data._embedded.elements?.forEach((item: { _links: { customField6: { title: string; }; status: {title: string} }; id: number, subject: any; description: { raw: any; }; startDate: any; lockVersion: number; dueDate: any; updatedAt: string | number | Date; }) => {
+    data._embedded.elements?.forEach((item: { _links: { customField6: { title: string; }; status: {title: string} }; id: number, spentTime: string, estimatedTime: string; subject: any; description: { raw: any; }; startDate: any; lockVersion: number; dueDate: any; updatedAt: string | number | Date; }) => {
         const userIndex = tempUsersData.findIndex(user => user.name === item._links?.customField6?.title)
 
         if (userIndex >= 0 && valueExistsInStatus(item._links.status.title)) {
@@ -53,14 +56,14 @@ export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[
                 title: String(item.id),
                 description: item.subject || "",
                 status: taskStatus,
-                estimated_time: 0,
+                estimated_time: parse(item.estimatedTime)?.hours,
                 start_date: item.startDate || "",
                 end_date: item.dueDate || "",
                 changedDate: new Date(item.updatedAt).toLocaleString().split(',').join(''),
                 caption: "",
                 color: "",
                 createdAt: "",
-                hours: 0
+                hours: parse(item.spentTime)?.hours
 
             })
 
