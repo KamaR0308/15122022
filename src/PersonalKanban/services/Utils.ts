@@ -56,7 +56,7 @@ export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[
                 title: String(item.id),
                 description: item.subject || "",
                 status: taskStatus,
-                estimated_time: parse(item.estimatedTime)?.hours,
+                estimated_time: item.estimatedTime ? parse(item.estimatedTime)?.hours : 0,
                 start_date: item.startDate || "",
                 end_date: item.dueDate || "",
                 changedDate: new Date(item.updatedAt).toLocaleString().split(',').join(''),

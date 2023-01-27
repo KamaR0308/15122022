@@ -129,10 +129,10 @@ const Card: React.FC<CardProps> = (props) => {
                         }
                     </Box>
                     {
-                        record.start_date && record.end_date ?
+                        record.start_date || record.end_date ?
                             <Typography component="p" style={{fontSize: 12}}>
-                                Дата {<span style={{fontWeight: 600, color: "gray"}}>{record.start_date} — <span
-                                style={{color: "red"}}>{record.end_date}</span></span>}
+                                Дата {<span style={{fontWeight: 600, color: "gray"}}>{record.start_date || ""} — <span
+                                style={{color: "red"}}>{record.end_date || ""}</span></span>}
                             </Typography> :
                             null
 
