@@ -43,9 +43,12 @@ const valueExistsInStatus = (status: string) => {
 }
 export const getUsersFromResponse = (defaultUsersData: User[], data: any): User[] => {
     const tempUsersData: User[] = defaultUsersData
-    data._embedded.elements?.forEach((item: { _links: { customField6: { title: string; }; status: {title: string} }; id: number, spentTime: string, estimatedTime: string; subject: any; description: { raw: any; }; startDate: any; lockVersion: number; dueDate: any; updatedAt: string | number | Date; }) => {
+    data.forEach((item: { _links: { customField6: { title: string; }; status: {title: string} }; id: number, spentTime: string, estimatedTime: string; subject: any; description: { raw: any; }; startDate: any; lockVersion: number; dueDate: any; updatedAt: string | number | Date; }) => {
+        if(item.id === 87) {
+            console.log(item)
+        }
         const userIndex = tempUsersData.findIndex(user => user.name === item._links?.customField6?.title)
-
+        console.log(userIndex)
         if (userIndex >= 0 && valueExistsInStatus(item._links.status.title)) {
             const taskStatus = valueExistsInStatus(item._links.status.title) as RecordStatus
 

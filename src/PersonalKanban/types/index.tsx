@@ -35,3 +35,15 @@ export type Column = {
   wipEnabled?: boolean;
   createdAt?: string;
 };
+export interface IResponseProject {
+  id: number,
+  _links: {
+    workPackages: {
+      href: string | undefined
+
+    }
+    status: {
+      href: string
+    } | undefined
+  }
+}

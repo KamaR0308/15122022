@@ -6,7 +6,7 @@ import Box from "@material-ui/core/Box";
 import {makeStyles} from "@material-ui/core/styles";
 
 import KanbanBoard from "PersonalKanban/components/KanbanBoard";
-import {Column, Record, User} from "PersonalKanban/types";
+import {Column, IResponseProject, Record, User} from "PersonalKanban/types";
 import {
     checkColumnsEmpty,
     getCreatedAt,
@@ -54,15 +54,21 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         initialState = getInitialState(contentCardKanban);
 
     }
-    const {req, loading, setLoading} = useFetch(() => {
+    const {req, loading, setLoading} = useFetch(async () => {
         //Получение задач с OpenProject, которые при попадании в resolve попадут в состояния.
-        OpenProjectService.getAllTasks().then(res => {
-            const users = getUsersFromResponse(defaultUsersData, res)
-            setUsers(users)
-            contentCardKanbanChange(choosedUserId)
-        }).then(() => {
-            setLoading(false)
-        })
+        const allTasks: any[] = []
+        const res = await OpenProjectService.getAllProjects()
+        const projects = res?._embedded.elements as IResponseProject[]
+        for (const item of projects) {
+            const projectTasks = await OpenProjectService.getAllTaskByProject(item.id)
+            projectTasks?._embedded.elements.forEach((val: any) => {
+                allTasks.push(val)
+            })
+        }
+        const users = getUsersFromResponse(defaultUsersData, allTasks)
+        setUsers(users)
+        contentCardKanbanChange(choosedUserId)
+        setLoading(false)
     })
 
     const cloneColumns = React.useCallback((columns: Column[]) => {
@@ -191,11 +197,22 @@ const KanbanBoardContainer: React.FC<KanbanBoardContainerProps> = (props) => {
         const cloneUsersState = usersState
         const indexRecord = cloneUsersState[choosedUserId - 1].records.findIndex(item => item.id === idRecord)
         cloneUsersState[choosedUserId - 1].records[indexRecord].hours = hours
-        OpenProjectService.updateTask({
-            lockVersion: cloneUsersState[choosedUserId - 1].records[indexRecord].lockVersion,
-            spentTime: serialize({
+        const date = new Date()
+        OpenProjectService.updateTime({
+            comment: {
+                format: "plain",
+                raw: "Kanban Test",
+            },
+            spentOn: `${date.toISOString().split('T')[0]}`,
+            hours: serialize({
                 hours: hours
-            })
+            }),
+            _links: {
+                workPackage: {
+                    href: `/api/v3/work_packages/${cloneUsersState[choosedUserId - 1].records[indexRecord].item_id}`
+                }
+
+            }
         }, cloneUsersState[choosedUserId - 1].records[indexRecord].item_id)
         setUsers([...cloneUsersState])
     }, [choosedUserId])

@@ -81,7 +81,7 @@ const ClearBoardButton: React.FC<ClearBoardButtonProps> = (props) => {
     const [open, setOpen] = React.useState(false);
 
     const handleOpenDialog = React.useCallback(() => {
-        setOpen(true);
+        document.location.reload()
     }, []);
 
     const handleCloseDialog = React.useCallback(() => {
